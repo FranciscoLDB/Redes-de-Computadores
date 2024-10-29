@@ -39,7 +39,7 @@ while True:
                     checksum = calculate_checksum(chunk)
                     numbered_chunk = f"{chunk_number:04d}".encode() + chunk
                     sock.sendto(checksum.encode(), addr)
-                    print(f"Checksum {checksum} enviado para {addr}")
+                    #print(f"Checksum {checksum} enviado para {addr}")
                     time.sleep(0.2)  # Delay de 0.2 segundos
 
                     sock.sendto(numbered_chunk, addr)

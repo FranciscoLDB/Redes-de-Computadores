@@ -8,7 +8,7 @@ UDP_PORT = 5005
 BUFFER_SIZE = 1028  # Tamanho do buffer
 FILENAME = ""  # Nome do arquivo a ser requisitado
 END_OF_FILE = b"EOF"  # Sinal de término
-fileslist = ["example.txt", "elements.txt", "porcentagem.txt"]
+fileslist = ["example.txt", "elements.txt", "porcentagem.txt", "img.png"]
 
 # Função para calcular o checksum
 def calculate_checksum(data):
@@ -23,27 +23,35 @@ def get_file(sock, filename):
     if not os.path.exists('./files received'):
         os.makedirs('./files received')
 
-    # Recepção do arquivo com verificação de checksum
-    with open(f"./files received/recebido_{filename}", 'wb') as f:
-        chunks_received = []
-        while True:
-            checksum, addr = sock.recvfrom(BUFFER_SIZE)
-            if checksum == END_OF_FILE:
-                print("Recepção do arquivo concluída.")
-                break
-            numbered_chunk, addr = sock.recvfrom(BUFFER_SIZE)
-            chunk_number = int(numbered_chunk[:4])
-            data = numbered_chunk[4:]
-            print(f"Recebido chunk número {chunk_number} de {addr}")
-            chunks_received.append(chunk_number)
+    chunks_received = {}
+    while True:
+        checksum, addr = sock.recvfrom(BUFFER_SIZE)
+        if checksum == END_OF_FILE:
+            print("Recepção do arquivo concluída.")
+            break
+        numbered_chunk, addr = sock.recvfrom(BUFFER_SIZE)
+        chunk_number = int(numbered_chunk[:4])
+        data = numbered_chunk[4:]
+        print(f"Recebido chunk número {chunk_number} de {addr}")
 
-            #print(f"Recebido checksum {checksum.decode()} de {addr}")
-            #print(f"Recebido numbered_chunk {numbered_chunk.decode()} de {addr}")
-            if calculate_checksum(data) == checksum.decode():
-                f.write(data)
-                print(f"Recebido {len(data)} bytes de {addr}")
-            else:
-                print("Erro de checksum, dados corrompidos")
+        if calculate_checksum(data) == checksum.decode():
+            chunks_received[chunk_number] = data
+        else:
+            print("Erro de checksum, dados corrompidos")
+
+    if not chunks_received:
+        print("Nenhum chunk recebido")
+        return
+
+    # Recepção do arquivo com verificação de checksum
+    os.makedirs("./files received", exist_ok=True)
+    try:
+        with open(f"./files received/recebido_{filename}", 'wb') as f:
+            for chunk_number in sorted(chunks_received.keys()):
+                f.write(chunks_received[chunk_number])
+    except Exception as e:
+        print(f"Erro ao abrir ou escrever no arquivo: {e}")
+    
 
     print(f"Arquivo {filename} recebido e salvo como ./files_received/recebido_{filename}\n")
     input("Pressione qualquer tecla para continuar...")

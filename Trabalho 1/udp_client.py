@@ -1,6 +1,7 @@
 import socket
 import hashlib
 import os
+from random import randint
 
 # Configurações do cliente
 UDP_IP = "127.0.0.1"
@@ -8,6 +9,7 @@ UDP_PORT = 5005
 BUFFER_SIZE = 1028  # Tamanho do buffer
 FILENAME = ""  # Nome do arquivo a ser requisitado
 END_OF_FILE = b"EOF"  # Sinal de término
+PACKAGE_LOST = 0  # Probabilidade de perda de pacotes
 fileslist = ["example.txt", "elements.txt", "porcentagem.txt", "img.png"]
 
 # Função para calcular o checksum
@@ -29,6 +31,11 @@ def get_file(sock, filename):
         if checksum == END_OF_FILE:
             print("Recepção do arquivo concluída.")
             break
+
+        if randint(1, 100) <= PACKAGE_LOST * 100:
+            print("Pacote perdido")
+            continue
+
         numbered_chunk, addr = sock.recvfrom(BUFFER_SIZE)
         chunk_number = int(numbered_chunk[:4])
         data = numbered_chunk[4:]
@@ -82,7 +89,8 @@ def menu_config():
     print("=" + " " * 2 + f"1 - Alterar IP [{UDP_IP}]" + " " * (15 - len(UDP_IP)) + "=")
     print("=" + " " * 2 + f"2 - Alterar Porta [{UDP_PORT}]" + " " * (12 - len(str(UDP_PORT))) + "=")
     print("=" + " " * 2 + f"3 - Alterar Buffer Size [{BUFFER_SIZE}]" + " " * (6 - len(str(BUFFER_SIZE))) + "=")
-    print("=" + " " * 2 + "4 - Voltar" + " " * 16 + "=")
+    print("=" + " " * 2 + f"4 - Package Lost [{PACKAGE_LOST*100}%]" + " " * (8 - len(str(PACKAGE_LOST*100))) + "=")
+    print("=" + " " * 2 + "5 - Voltar" + " " * 16 + "=")
     print("=-" * 15 + "=")
     return input("Escolha uma opção: ")
 
@@ -105,6 +113,12 @@ while True:
             elif option == "3":
                 BUFFER_SIZE = int(input("Digite o novo buffer size: "))
             elif option == "4":
+                new_package_lost = float(input("Digite a nova probabilidade de perda de pacotes (0-100): "))
+                if 0 <= new_package_lost <= 100:
+                    PACKAGE_LOST = new_package_lost / 100
+                else:
+                    print("Valor inválido. A probabilidade deve estar entre 0 e 100.")
+            elif option == "5":
                 break
             else:
                 print("Opção inválida. Tente novamente.")

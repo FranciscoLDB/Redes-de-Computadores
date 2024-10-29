@@ -2,14 +2,12 @@ import socket
 import os
 import hashlib
 import time
-from random import randint
 
 # Configurações do servidor
 UDP_IP = "127.0.0.1"
 UDP_PORT = 5005
 BUFFER_SIZE = 1024  # Tamanho do buffer
 END_OF_FILE = b"EOF"  # Sinal de término
-PACKAGE_LOST = 0.1  # Probabilidade de perda de pacotes
 
 # Função para calcular o checksum
 def calculate_checksum(data):
@@ -39,16 +37,9 @@ while True:
                     if not chunk:
                         break
 
-                    # Simular perda de pacotes
-                    if randint(1, 100) <= PACKAGE_LOST * 100:
-                        print(f"Pacote {chunk_number} perdido")
-                        chunk_number += 1
-                        continue
-
                     checksum = calculate_checksum(chunk)
                     numbered_chunk = f"{chunk_number:04d}".encode() + chunk
                     sock.sendto(checksum.encode(), addr)
-                    #print(f"Checksum {checksum} enviado para {addr}")
                     time.sleep(0.2)  # Delay de 0.2 segundos
 
                     sock.sendto(numbered_chunk, addr)
@@ -58,7 +49,10 @@ while True:
                     chunk_number += 1
                 # Enviar sinal de término
                 sock.sendto(END_OF_FILE, addr)
-                print(f"Arquivo {filename} enviado para {addr}")
+                print(f"Arquivo {filename} enviado para {addr}\n")
+                # recebe mensagem de resposta se ok ou se falta de pacote
+                data, addr = sock.recvfrom(BUFFER_SIZE)
+                print(f"Resposta do cliente: {data.decode()}")
         else:
             error_message = f"ERRO: Arquivo {filename} não encontrado no diretório ./server files"
             sock.sendto(error_message.encode(), addr)

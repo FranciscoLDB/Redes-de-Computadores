@@ -1,6 +1,7 @@
 import socket
 import os
 import hashlib
+import time
 
 # Configurações do servidor
 UDP_IP = "127.0.0.1"
@@ -25,20 +26,23 @@ while True:
 
     if request.startswith("GET"):
         filename = request.split()[1].lstrip('/')
-        if os.path.isfile(filename):
-            with open(filename, 'rb') as f:
-                while True:
+        filepath = os.path.join('./server files', filename)
+        if os.path.isfile(filepath):
+            with open(filepath, 'rb') as f:
+                while True: 
                     chunk = f.read(BUFFER_SIZE)
                     if not chunk:
                         break
                     checksum = calculate_checksum(chunk)
                     sock.sendto(checksum.encode(), addr)
+                    time.sleep(0.3)  # Delay de 1 segundo
                     sock.sendto(chunk, addr)
+                    time.sleep(0.3)  # Delay de 1 segundo
                 # Enviar sinal de término
                 sock.sendto(END_OF_FILE, addr)
                 print(f"Arquivo {filename} enviado para {addr}")
         else:
-            error_message = f"ERRO: Arquivo {filename} não encontrado no diretório {os.getcwd()}"
+            error_message = f"ERRO: Arquivo {filename} não encontrado no diretório ./server files"
             sock.sendto(error_message.encode(), addr)
             print(error_message)
     else:

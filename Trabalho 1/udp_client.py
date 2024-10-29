@@ -5,8 +5,8 @@ import os
 # Configurações do cliente
 UDP_IP = "127.0.0.1"
 UDP_PORT = 5005
-BUFFER_SIZE = 1024  # Tamanho do buffer
-FILENAME = "example.txt"  # Nome do arquivo a ser requisitado
+BUFFER_SIZE = 516  # Tamanho do buffer
+FILENAME = ""  # Nome do arquivo a ser requisitado
 END_OF_FILE = b"EOF"  # Sinal de término
 
 # Função para calcular o checksum
@@ -18,8 +18,12 @@ def get_file(sock, filename):
     request = f"GET /{filename}"
     sock.sendto(request.encode(), (UDP_IP, UDP_PORT))
 
+    # Criação do diretório se não existir
+    if not os.path.exists('./files received'):
+        os.makedirs('./files received')
+
     # Recepção do arquivo com verificação de checksum
-    with open(f"recebido_{filename}", 'wb') as f:
+    with open(f"./files received/recebido_{filename}", 'wb') as f:
         while True:
             checksum, addr = sock.recvfrom(BUFFER_SIZE)
             if checksum == END_OF_FILE:
@@ -32,24 +36,64 @@ def get_file(sock, filename):
             else:
                 print("Erro de checksum, dados corrompidos")
 
-    print(f"Arquivo {filename} recebido e salvo como recebido_{filename}\n")
+    print(f"Arquivo {filename} recebido e salvo como ./files_received/recebido_{filename}\n")
 
 def menu():
+    os.system('cls' if os.name == 'nt' else 'clear')
     print("=-" * 15 + "=")
     print("=" + " " * 2 + "Menu de opções:" + " " * 12 + "=")
-    print("=" + " " * 2 + "1 - Enviar arquivo" + " " * 9 + "=")
-    print("=" + " " * 2 + "2 - Sair" + " " * 19 + "=")
+    print("=" + " " * 2 + "1 - Receber arquivo" + " " * 9 + "=")
+    print("=" + " " * 2 + "2 - Configuração   " + " " * 9 + "=")
+    print("=" + " " * 2 + "3 - Sair" + " " * 19 + "=")
     print("=-" * 15 + "=")
     return input("Escolha uma opção: ")
+
+fileslist = ["example.txt", "elements.txt", "porcentagem.txt"]
+def menu_choose_file():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("=-" * 15 + "=")
+    print("=" + " " * 2 + "Menu de opções:" + " " * 12 + "=")
+    for i, file in enumerate(fileslist):
+        print("=" + " " * 2 + f"{i+1} - {file}" + " " * (20-len(file)) + "=")
+    print("=-" * 15 + "=")
+    return int(input("Escolha o arquivo: "))
+
+def menu_config():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("=-" * 15 + "=")
+    print("=" + " " * 2 + "Menu de opções:" + " " * 12 + "=")
+    print("=" + " " * 2 + f"1 - Alterar IP (Atual: {UDP_IP})" + " " * (15 - len(UDP_IP)) + "=")
+    print("=" + " " * 2 + f"2 - Alterar Porta (Atual: {UDP_PORT})" + " " * (12 - len(str(UDP_PORT))) + "=")
+    print("=" + " " * 2 + f"3 - Alterar Buffer Size (Atual: {BUFFER_SIZE})" + " " * (6 - len(str(BUFFER_SIZE))) + "=")
+    print("=" + " " * 2 + "4 - Voltar" + " " * 16 + "=")
+    print("=-" * 15 + "=")
+    return input("Escolha uma opção: ")
+
 
 while True:
     option = menu()
     #os.system('cls' if os.name == 'nt' else 'clear')
     if option == "1":
+        file_index = menu_choose_file()
+        FILENAME = fileslist[file_index-1]
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         get_file(sock, FILENAME)
         sock.close()
     elif option == "2":
+        while True:
+            option = menu_config()
+            if option == "1":
+                UDP_IP = input("Digite o novo IP: ")
+            elif option == "2":
+                UDP_PORT = int(input("Digite a nova porta: "))
+            elif option == "3":
+                BUFFER_SIZE = int(input("Digite o novo buffer size: "))
+            elif option == "4":
+                break
+            else:
+                print("Opção inválida. Tente novamente.")
+        pass
+    elif option == "3":
         break
     else:
         print("Opção inválida. Tente novamente.")

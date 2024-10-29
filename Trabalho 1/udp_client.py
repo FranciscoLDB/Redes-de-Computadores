@@ -5,9 +5,10 @@ import os
 # Configurações do cliente
 UDP_IP = "127.0.0.1"
 UDP_PORT = 5005
-BUFFER_SIZE = 516  # Tamanho do buffer
+BUFFER_SIZE = 1028  # Tamanho do buffer
 FILENAME = ""  # Nome do arquivo a ser requisitado
 END_OF_FILE = b"EOF"  # Sinal de término
+fileslist = ["example.txt", "elements.txt", "porcentagem.txt"]
 
 # Função para calcular o checksum
 def calculate_checksum(data):
@@ -24,12 +25,20 @@ def get_file(sock, filename):
 
     # Recepção do arquivo com verificação de checksum
     with open(f"./files received/recebido_{filename}", 'wb') as f:
+        chunks_received = []
         while True:
             checksum, addr = sock.recvfrom(BUFFER_SIZE)
             if checksum == END_OF_FILE:
                 print("Recepção do arquivo concluída.")
                 break
-            data, addr = sock.recvfrom(BUFFER_SIZE)
+            numbered_chunk, addr = sock.recvfrom(BUFFER_SIZE)
+            chunk_number = int(numbered_chunk[:4])
+            data = numbered_chunk[4:]
+            print(f"Recebido chunk número {chunk_number} de {addr}")
+            chunks_received.append(chunk_number)
+
+            #print(f"Recebido checksum {checksum.decode()} de {addr}")
+            #print(f"Recebido numbered_chunk {numbered_chunk.decode()} de {addr}")
             if calculate_checksum(data) == checksum.decode():
                 f.write(data)
                 print(f"Recebido {len(data)} bytes de {addr}")
@@ -37,6 +46,7 @@ def get_file(sock, filename):
                 print("Erro de checksum, dados corrompidos")
 
     print(f"Arquivo {filename} recebido e salvo como ./files_received/recebido_{filename}\n")
+    input("Pressione qualquer tecla para continuar...")
 
 def menu():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -48,7 +58,6 @@ def menu():
     print("=-" * 15 + "=")
     return input("Escolha uma opção: ")
 
-fileslist = ["example.txt", "elements.txt", "porcentagem.txt"]
 def menu_choose_file():
     os.system('cls' if os.name == 'nt' else 'clear')
     print("=-" * 15 + "=")
@@ -62,13 +71,12 @@ def menu_config():
     os.system('cls' if os.name == 'nt' else 'clear')
     print("=-" * 15 + "=")
     print("=" + " " * 2 + "Menu de opções:" + " " * 12 + "=")
-    print("=" + " " * 2 + f"1 - Alterar IP (Atual: {UDP_IP})" + " " * (15 - len(UDP_IP)) + "=")
-    print("=" + " " * 2 + f"2 - Alterar Porta (Atual: {UDP_PORT})" + " " * (12 - len(str(UDP_PORT))) + "=")
-    print("=" + " " * 2 + f"3 - Alterar Buffer Size (Atual: {BUFFER_SIZE})" + " " * (6 - len(str(BUFFER_SIZE))) + "=")
+    print("=" + " " * 2 + f"1 - Alterar IP [{UDP_IP}]" + " " * (15 - len(UDP_IP)) + "=")
+    print("=" + " " * 2 + f"2 - Alterar Porta [{UDP_PORT}]" + " " * (12 - len(str(UDP_PORT))) + "=")
+    print("=" + " " * 2 + f"3 - Alterar Buffer Size [{BUFFER_SIZE}]" + " " * (6 - len(str(BUFFER_SIZE))) + "=")
     print("=" + " " * 2 + "4 - Voltar" + " " * 16 + "=")
     print("=-" * 15 + "=")
     return input("Escolha uma opção: ")
-
 
 while True:
     option = menu()

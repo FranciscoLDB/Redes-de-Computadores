@@ -17,6 +17,8 @@ def calculate_checksum(data):
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
 
+print(f"IP {UDP_IP} | Porta {UDP_PORT}")
+print(f"Tamanho do buffer: {BUFFER_SIZE} bytes")
 print("Servidor UDP pronto para receber mensagens...")
 
 while True:
@@ -29,15 +31,22 @@ while True:
         filepath = os.path.join('./server files', filename)
         if os.path.isfile(filepath):
             with open(filepath, 'rb') as f:
+                chunk_number = 0
                 while True: 
                     chunk = f.read(BUFFER_SIZE)
                     if not chunk:
                         break
                     checksum = calculate_checksum(chunk)
+                    numbered_chunk = f"{chunk_number:04d}".encode() + chunk
                     sock.sendto(checksum.encode(), addr)
-                    time.sleep(0.3)  # Delay de 1 segundo
-                    sock.sendto(chunk, addr)
-                    time.sleep(0.3)  # Delay de 1 segundo
+                    print(f"Checksum {checksum} enviado para {addr}")
+                    time.sleep(0.2)  # Delay de 0.2 segundos
+
+                    sock.sendto(numbered_chunk, addr)
+                    print(f"Chunk número {chunk_number} enviado para {addr}")
+                    time.sleep(0.2)  # Delay de 0.2 segundos
+                    
+                    chunk_number += 1
                 # Enviar sinal de término
                 sock.sendto(END_OF_FILE, addr)
                 print(f"Arquivo {filename} enviado para {addr}")

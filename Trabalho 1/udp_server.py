@@ -9,6 +9,7 @@ UDP_PORT = 5005
 BUFFER_SIZE = 1024  # Tamanho do buffer
 END_OF_FILE = b"EOF"  # Sinal de término
 FILE_NOT_FOUND = b"FNF" # Sinal de arquivo não encontrado
+DELAY = 0.5  # Delay das mensagens
 
 # Função para calcular o checksum
 def calculate_checksum(data):
@@ -41,11 +42,11 @@ while True:
                     checksum = calculate_checksum(chunk)
                     numbered_chunk = f"{chunk_number:04d}".encode() + chunk
                     sock.sendto(checksum.encode(), addr)
-                    time.sleep(0.2)  # Delay de 0.2 segundos
+                    time.sleep(DELAY)
 
                     sock.sendto(numbered_chunk, addr)
                     print(f"Chunk número {chunk_number} enviado para {addr}")
-                    time.sleep(0.2)  # Delay de 0.2 segundos
+                    time.sleep(DELAY)
                     
                     chunk_number += 1
                 # Enviar sinal de término

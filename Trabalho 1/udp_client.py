@@ -43,10 +43,7 @@ def discard_chunks(chunks_received):
 def resend_chunks(sock, chunks_received, filename):
     chunk_number = int(input("Digite o número do chunk a ser reenviado [-1 para reenviar todos]: "))
     if chunk_number == -1:
-        for chunk_number in chunks_received:
-            request = f"GET /{filename} CHUNK /{chunk_number}"
-    elif chunk_number in find_lost_chunks(chunks_received):
-        request = f"GET /{filename} CHUNKS /"
+        request = f"GET /{filename} ALL"
         sock.sendto(request.encode(), (UDP_IP, UDP_PORT))
         print(f"Requisição enviada para {UDP_IP}:{UDP_PORT}")
         sock.settimeout(TIME_OUT)
@@ -55,24 +52,29 @@ def resend_chunks(sock, chunks_received, filename):
         except socket.timeout:
             print("Tempo limite de espera excedido.")
             input("Pressione qualquer tecla para continuar...")
-            return
-
-        if signalChunk[:3] == FILE_NOT_FOUND:
-            print(f"Arquivo {filename} não encontrado.")
+            return chunks_received
+        if signalChunk[:3] != CHUNKS:
+            print("Sinal de chunks não recebido")
             input("Pressione qualquer tecla para continuar...")
-            return
-    
-        chunks_received = receive_file(sock, filename)    
+            return chunks_received
         
-        print(f"Chunk {chunk_number} reenviado")
+        global total_chunks
+        total_chunks = int(signalChunk[3:].decode())
+        print(f"Total de chunks a serem recebidos: {total_chunks}")
+        return receive_file(sock, filename, chunks_received)
+    elif chunk_number in find_lost_chunks(chunks_received):
+        request = f"GET /{filename} CHUNKS /{chunk_number}"
+        sock.sendto(request.encode(), (UDP_IP, UDP_PORT))
+        print(f"Requisição enviada para {UDP_IP}:{UDP_PORT}")
+        return receive_file(sock, filename)    
     else:
         print(f"Chunk {chunk_number} não encontrado")
+        return chunks_received
 
 def find_lost_chunks(chunks_received):
     return [i for i in range(total_chunks) if i not in chunks_received]
 
-def receive_file(sock, filename):
-    chunks_received = {}
+def receive_file(sock, filename, chunks_received = {}):
     while True:
         
         sock.settimeout(TIME_OUT)
@@ -91,6 +93,7 @@ def receive_file(sock, filename):
         except socket.timeout:
             print("Tempo limite de espera excedido.")
             break
+
         chunk_number = int(numbered_chunk[:4])
         data = numbered_chunk[4:]
         print(f"Recebido chunk número {chunk_number} de {addr}")
@@ -147,14 +150,12 @@ def get_file(sock, filename):
         elif option == "3":
             discard_chunks(chunks_received)
         elif option == "4":
-            resend_chunks(sock, chunks_received, filename)
+            chunks_received = resend_chunks(sock, chunks_received, filename)
         elif option == "5":
             break
         else:
             print("Opção inválida. Tente novamente.")
         input("Pressione qualquer tecla para continuar...")  
-
-    input("Pressione qualquer tecla para continuar...")
 
 def menu():
     os.system('cls' if os.name == 'nt' else 'clear')

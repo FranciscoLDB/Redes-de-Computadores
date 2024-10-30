@@ -75,6 +75,9 @@ def chunk_request(request):
                 time.sleep(DELAY)
                 sock.sendto(numbered_chunk, addr)
                 print(f"Chunk número {chunk_number} enviado")
+                
+            sock.sendto(END_OF_FILE, addr)
+            print(f"Arquivo {filename} enviado para {addr}\n")
     else:
         sock.sendto(FILE_NOT_FOUND, addr)
         print(f"Arquivo {filename} não encontrado. Mensagem de erro enviada.")

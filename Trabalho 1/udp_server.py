@@ -8,6 +8,7 @@ UDP_IP = "127.0.0.1"
 UDP_PORT = 5005
 BUFFER_SIZE = 1024  # Tamanho do buffer
 END_OF_FILE = b"EOF"  # Sinal de término
+FILE_NOT_FOUND = b"FNF" # Sinal de arquivo não encontrado
 
 # Função para calcular o checksum
 def calculate_checksum(data):
@@ -51,12 +52,11 @@ while True:
                 sock.sendto(END_OF_FILE, addr)
                 print(f"Arquivo {filename} enviado para {addr}\n")
                 # recebe mensagem de resposta se ok ou se falta de pacote
-                data, addr = sock.recvfrom(BUFFER_SIZE)
-                print(f"Resposta do cliente: {data.decode()}")
+                #data, addr = sock.recvfrom(BUFFER_SIZE)
+                #print(f"Resposta do cliente: {data.decode()}")
         else:
-            error_message = f"ERRO: Arquivo {filename} não encontrado no diretório ./server files"
-            sock.sendto(error_message.encode(), addr)
-            print(error_message)
+            sock.sendto(FILE_NOT_FOUND, addr)
+            print(f"Arquivo {filename} não encontrado. Mensagem de erro enviada.")
     else:
         error_message = "ERRO: Requisição inválida"
         sock.sendto(error_message.encode(), addr)

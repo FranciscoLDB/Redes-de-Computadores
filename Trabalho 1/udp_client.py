@@ -9,8 +9,9 @@ UDP_PORT = 5005
 BUFFER_SIZE = 1028  # Tamanho do buffer
 FILENAME = ""  # Nome do arquivo a ser requisitado
 END_OF_FILE = b"EOF"  # Sinal de término
+FILE_NOT_FOUND = b"FNF" # Sinal de arquivo não encontrado
 PACKAGE_LOST = 0  # Probabilidade de perda de pacotes
-fileslist = ["example.txt", "elements.txt", "porcentagem.txt", "img.png"]
+fileslist = ["elements.txt", "porcentagem.txt", "img.png", "notfound.txt"]
 
 # Função para calcular o checksum
 def calculate_checksum(data):
@@ -31,6 +32,10 @@ def get_file(sock, filename):
         if checksum == END_OF_FILE:
             print("Recepção do arquivo concluída.")
             break
+        elif checksum == FILE_NOT_FOUND:
+            print(f"Arquivo {filename} não encontrado.")
+            input("Pressione qualquer tecla para continuar...")
+            return
 
         if randint(1, 100) <= PACKAGE_LOST * 100:
             print("Pacote perdido")
@@ -98,11 +103,16 @@ while True:
     option = menu()
     #os.system('cls' if os.name == 'nt' else 'clear')
     if option == "1":
-        file_index = menu_choose_file()
-        FILENAME = fileslist[file_index-1]
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        get_file(sock, FILENAME)
-        sock.close()
+        while True:
+            file_index = menu_choose_file()
+            if 1 <= file_index <= len(fileslist):
+                FILENAME = fileslist[file_index-1]
+                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                get_file(sock, FILENAME)
+                sock.close()
+                break
+            else:
+                print("Opção inválida. Tente novamente.")
     elif option == "2":
         while True:
             option = menu_config()

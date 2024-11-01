@@ -8,7 +8,7 @@ import time
 SERVER_IP = "0.0.0.0"
 SERVER_PORT = 5003
 BUFFER_SIZE = 4096
-DELAY = 0
+DELAY = 0.01
 
 def handle_client(client_socket):
     client_ip, client_port = client_socket.getpeername()

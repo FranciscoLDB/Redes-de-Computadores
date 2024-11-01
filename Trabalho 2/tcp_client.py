@@ -115,8 +115,7 @@ def archive():
         progress_bar((len(received_data) / file_size) * 100)
 
     # Verifica o hash
-    hash_isOk = check_hash(received_data, file_hash)
-    if hash_isOk:
+    if check_hash(received_data, file_hash):
         with open("client files/" + file_name, "wb") as f:
             f.write(received_data)
         print("Arquivo recebido e verificado com sucesso.")

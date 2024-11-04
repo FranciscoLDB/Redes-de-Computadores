@@ -14,7 +14,9 @@ def menu():
     os.system('cls' if os.name == 'nt' else 'clear')
     print("=-" * 15 + "=")
     status = "Conectado" if IS_CONNECTED else "Desconectado"
-    print("=" + " " * 2 + f"Status: {status}" + " " * (23 - len(status)) + "=")
+    color = "\033[92m" if IS_CONNECTED else "\033[91m"
+    reset_color = "\033[0m"
+    print("=" + " " * 2 + f"Status: {color}{status}{reset_color}" + " " * (19 - len(status)) + "=")
     print("=" + " " * 2 + "Menu de opções:    " + " " * 8 + "=")
     print("=" + " " * 2 + "1 - Receber arquivo" + " " * 8 + "=")
     print("=" + " " * 2 + "2 - Chat           " + " " * 8 + "=")
@@ -88,13 +90,20 @@ def archive():
 
     # Recebe os metadados
     metadados = CLIENT.recv(BUFFER_SIZE).decode('utf-8')
-    resp_name, resp_size, resp_pckg, resp_hash = metadados.split(";")
-    print_metadata(metadados)
-
-    file_name = resp_name.split(":")[1]
-    file_size = int(resp_size.split(":")[1])
-    file_packages = int(resp_pckg.split(":")[1])
-    file_hash = resp_hash.split(":")[1]
+    if metadados.strip().split(':')[1].upper() == "NOK":
+        print("Arquivo inexistente.")
+        return
+    
+    try :
+        resp_name, resp_size, resp_pckg, resp_hash = metadados.split(";")
+        print_metadata(metadados)
+        file_name = resp_name.split(":")[1]
+        file_size = int(resp_size.split(":")[1])
+        file_packages = int(resp_pckg.split(":")[1])
+        file_hash = resp_hash.split(":")[1]
+    except:
+        print("Erro ao receber metadados.")
+        return
 
     # Pede confirmacao para o usuario
     confirm = input("Deseja baixar o arquivo? (s/n) ")
@@ -102,17 +111,19 @@ def archive():
         print("Download cancelado.")
         CLIENT.send("NOK".encode('utf-8'))
         return
-    # Envia a confirmação
     CLIENT.send("OK".encode('utf-8'))
 
-    # Recebe os dados do arquivo em pacotes
-    received_data = b""
-    while len(received_data) < file_size:
-        packet = CLIENT.recv(BUFFER_SIZE)
-        if not packet:
-            break
-        received_data += packet
-        progress_bar((len(received_data) / file_size) * 100)
+    try:
+        received_data = b""
+        while len(received_data) < file_size:
+            packet = CLIENT.recv(BUFFER_SIZE)
+            if not packet:
+                break
+            received_data += packet
+            progress_bar((len(received_data) / file_size) * 100)
+    except:
+        print("Erro ao receber arquivo.")
+        return
 
     # Verifica o hash
     if check_hash(received_data, file_hash):
@@ -121,6 +132,7 @@ def archive():
         print("Arquivo recebido e verificado com sucesso.")
     else:
         print("Erro na verificação do arquivo.")
+        return
 
     # Recebe o status final
     status = CLIENT.recv(BUFFER_SIZE).decode('utf-8').split(":")[1]

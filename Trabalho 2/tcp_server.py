@@ -7,12 +7,12 @@ import time
 # Variáveis globais para IP e porta
 SERVER_IP = "0.0.0.0"
 SERVER_PORT = 5003
-BUFFER_SIZE = 4096
+BUFFER_SIZE = 8192
 DELAY = 0.01
 
 def handle_client(client_socket):
     client_ip, client_port = client_socket.getpeername()
-    print(f"Cliente conectado com IP: {client_ip} e porta: {client_port}")
+    print(f"\033[92mCliente conectado com IP: {client_ip} e porta: {client_port}\033[0m")
     client_socket.send(b"Bem-vindo ao servidor TCP!")
 
     while True:
@@ -26,7 +26,7 @@ def handle_client(client_socket):
             print(f"[{client_ip}:{client_port}] Recebido: {message}")
 
             if message.strip().upper() == "SAIR":
-                print(f"[{client_ip}:{client_port}] Cliente solicitou desconexão.")
+                print(f"\033[91m[{client_ip}:{client_port}] Cliente solicitou desconexão.\033[0m")
                 break
             elif message.strip().upper().startswith("ARQUIVO"):
                 _, file_name = message.split()
@@ -47,7 +47,7 @@ def handle_client(client_socket):
                     # Recebe a confirmação do cliente
                     confirm = client_socket.recv(BUFFER_SIZE).decode('utf-8')
                     if confirm.strip().upper() != "OK":
-                        print(f"[{client_ip}:{client_port}] Cliente não confirmou o download.")
+                        print(f"\033[93m[{client_ip}:{client_port}] Cliente não confirmou o download.\033[0m")
                         continue
 
                     # Envia os dados do arquivo em pacotes
@@ -59,15 +59,16 @@ def handle_client(client_socket):
                                 break
                             cont_pacotes += 1
                             client_socket.send(bytes_read)
-                            print(f"[{client_ip}:{client_port}] Enviando dados do arquivo [{cont_pacotes}/{file_packages}]...")
+                            if cont_pacotes == 1 or cont_pacotes % (file_packages // 10) == 0 or cont_pacotes == file_packages:
+                                print(f"\033[32m[{client_ip}:{client_port}] Enviando dados do arquivo [{cont_pacotes}/{file_packages}]...\033[0m")
                             time.sleep(DELAY)
 
                     # Envia o status final
                     client_socket.send(b"STATUS:OK")
-                    print(f"[{client_ip}:{client_port}] Arquivo enviado com sucesso.")
+                    print(f"\033[32m[{client_ip}:{client_port}] Arquivo enviado com sucesso.\033[0m")
                 else:
                     client_socket.send(b"STATUS:NOK")
-                    print(f"[{client_ip}:{client_port}] Arquivo inexistente.")
+                    print(f"\033[93m[{client_ip}:{client_port}] Arquivo inexistente.\033[0m")
 
             elif message.strip().upper() == "CHAT":
                 # Envia uma mensagem de chat para o cliente

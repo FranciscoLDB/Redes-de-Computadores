@@ -7,7 +7,7 @@ import time
 
 # Variáveis globais para IP e porta
 SERVER_IP = "0.0.0.0"
-SERVER_PORT = 5009
+SERVER_PORT = 5000
 BUFFER_SIZE = 8192
 DELAY = 0.01
 
@@ -37,7 +37,11 @@ def handle_client(client_socket):
                     response_body = file.read()
                 response_header = 'HTTP/1.1 200 OK\n'
             else:
-                response_body = b"<html><body><h1>404 Not Found</h1></body></html>"
+                try:
+                    with open('server files/error.html', 'rb') as file:
+                        response_body = file.read()
+                except:
+                    response_body = b"<html><body><h1>404 Not Found</h1></body></html>"
                 response_header = 'HTTP/1.1 404 Not Found\n'
 
             # Envia a resposta HTTP

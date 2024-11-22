@@ -4,7 +4,7 @@ import os
 
 # Variáveis globais para IP e porta
 SERVER_IP = "0.0.0.0"
-SERVER_PORT = 5003
+SERVER_PORT = 5000
 BUFFER_SIZE = 8192
 
 def handle_client(client_socket):
@@ -63,11 +63,12 @@ def handle_client(client_socket):
     except Exception as e:
         print(f"Erro ao processar a requisição: {e}")
     finally:
-        client_socket.close()
         if '200 OK' in response_header:
             print(f"\033[92mResposta enviada com sucesso:\n{response_header}\033[0m")
         else:
             print(f"\033[91mResposta enviada com erro:\n{response_header}\033[0m")
+            
+        client_socket.close()
         print(f"Cliente desconectado com IP: {client_ip} e porta: {client_port}")
 
 def main():

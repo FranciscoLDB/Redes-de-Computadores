@@ -1,15 +1,11 @@
-import random
 import socket
 import threading
-import hashlib
 import os
-import time
 
 # Variáveis globais para IP e porta
 SERVER_IP = "0.0.0.0"
 SERVER_PORT = 5000
 BUFFER_SIZE = 8192
-DELAY = 0.01
 
 def handle_client(client_socket):
     client_ip, client_port = client_socket.getpeername()
@@ -45,7 +41,14 @@ def handle_client(client_socket):
                 response_header = 'HTTP/1.1 404 Not Found\n'
 
             # Envia a resposta HTTP
-            response_header += 'Content-Type: text/html\n'
+            if path.endswith('.jpeg'):
+                response_header += 'Content-Type: image/jpeg\n'
+            elif path.endswith('.png'):
+                response_header += 'Content-Type: image/png\n'
+            elif path.endswith('.json'):
+                response_header += 'Content-Type: application/json\n'
+            else:
+                response_header += 'Content-Type: text/html\n'
             response_header += f'Content-Length: {len(response_body)}\n'
             response_header += 'Connection: close\n\n'
             client_socket.send(response_header.encode('utf-8') + response_body)
@@ -60,6 +63,11 @@ def handle_client(client_socket):
     except Exception as e:
         print(f"Erro ao processar a requisição: {e}")
     finally:
+        if '200 OK' in response_header:
+            print(f"\033[92mResposta enviada com sucesso:\n{response_header}\033[0m")
+        else:
+            print(f"\033[91mResposta enviada com erro:\n{response_header}\033[0m")
+            
         client_socket.close()
         print(f"Cliente desconectado com IP: {client_ip} e porta: {client_port}")
 

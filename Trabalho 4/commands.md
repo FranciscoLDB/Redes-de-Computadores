@@ -27,10 +27,10 @@
 3. No swtich os computadores estão conectados nas seguintes interfaces:
     | Switch  | Máquina | Porta  |
     |---------|---------|--------|
-    | SWT1    | PC10    | F1/1   |
-    | SWT1    | PC20    | F2/1   |
-    | SWT1    | PC30    | F3/1   |
-    | SWT1    | PC40    | F4/1   |
+    | SWT1    | PC1    | F1/1   |
+    | SWT1    | PC2    | F2/1   |
+    | SWT1    | PC3    | F3/1   |
+    | SWT1    | PC4    | F4/1   |
 
 5.  No swtich foi digitado os seguintes comandos no **CLI**:
 

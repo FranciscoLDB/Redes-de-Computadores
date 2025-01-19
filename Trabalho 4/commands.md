@@ -183,24 +183,61 @@
     Swtich# exit
     Swtich>  
      ```
+
 6. Pings
     1. VLAN1 com VLAN1 (No mesmo switch)
         - PC10 -> PC20
        
            ![image](https://github.com/user-attachments/assets/c634724f-4d05-408f-be96-3ff30cf8a290)
         
-    3. VLAN1 com VLAN2 (No mesmo switch)
+    2. VLAN1 com VLAN2 (No mesmo switch)
         - PC10 -> PC30
        
            ![image](https://github.com/user-attachments/assets/e8809223-09eb-4a88-bd0a-a672722d390e)
           
-    5. VLAN1 com VLAN1 (Em switchs diferentes)
+    3. VLAN1 com VLAN1 (Em switchs diferentes)
         - PC10 -> PC50
        
           ![image](https://github.com/user-attachments/assets/7596127f-9bf7-40a3-841c-7a7fe26b4e3c)
 
-    6. VLAN1 com VLAN2 (Em switchs diferentes)
+    4. VLAN1 com VLAN2 (Em switchs diferentes)
         - PC10 -> PC70
        
           ![image](https://github.com/user-attachments/assets/0c3bfdfb-9fdb-488b-b36f-14dd2ca39cfe)
 
+7. Alterando tudo para VLAN 1:
+    *Obs: VLAN 1 já vem configurada por default*
+    - Configura portas 3 e 4 para vlan1
+    - As portas 1 e 2 já estão na vlan1
+    ```
+    Swtich> enable
+    Swtich# confi t
+    Swtich(config)# int f3/1
+    Swtich(config-if)# switchport access vlan2
+    Swtich(config)# int f4/1
+    Swtich(config-if)# switchport access vlan2
+    Swtich(config-if)# end
+    Swtich# exit
+    Swtich>  
+     ```
+
+8. Pings
+    1. VLAN1 com VLAN1 (No mesmo switch)
+        - PC10 -> PC20
+       
+           !
+        
+    2. VLAN1 com VLAN1 (No mesmo switch)
+        - PC10 -> PC30
+       
+           ![image](https://github.com/user-attachments/assets/e8809223-09eb-4a88-bd0a-a672722d390e)
+          
+    3. VLAN1 com VLAN1 (Em switchs diferentes)
+        - PC10 -> PC50
+       
+          ![image](https://github.com/user-attachments/assets/7596127f-9bf7-40a3-841c-7a7fe26b4e3c)
+
+    4. VLAN1 com VLAN1 (Em switchs diferentes)
+        - PC10 -> PC70
+       
+          ![image](https://github.com/user-attachments/assets/0c3bfdfb-9fdb-488b-b36f-14dd2ca39cfe)

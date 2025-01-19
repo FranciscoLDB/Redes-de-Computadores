@@ -88,15 +88,15 @@
         | PC30    | 192.168.0.30 | 255.255.255.0 |
         | PC40    | 192.168.0.40 | 255.255.255.0 |
 
-    - Computadores na rede 192.168.1.0/24
+    - Computadores na rede 192.168.0.0/24
         | Máquina | IP           | Máscara       |
         |---------|--------------|---------------|
-        | PC50    | 192.168.1.50 | 255.255.255.0 |
-        | PC60    | 192.168.1.60 | 255.255.255.0 |
-        | PC70    | 192.168.1.70 | 255.255.255.0 |
-        | PC80    | 192.168.1.80 | 255.255.255.0 |
+        | PC50    | 192.168.0.50 | 255.255.255.0 |
+        | PC60    | 192.168.0.60 | 255.255.255.0 |
+        | PC70    | 192.168.0.70 | 255.255.255.0 |
+        | PC80    | 192.168.0.80 | 255.255.255.0 |
 
-    ![image](https://github.com/user-attachments/assets/e643d162-ce0b-49d1-9251-982d89027c1f)
+    ![image](https://github.com/user-attachments/assets/1ff17eca-6d24-401a-8e04-5aa051eb19e4)
 
 2. Nos swtichs os computadores estão conectados nas seguintes interfaces:
     1. Swtich SWT10:
@@ -126,7 +126,7 @@
         | SWT10   | F1/1   |
         | SWT20   | F2/1   |
    
-4. No Switch da Rede 1 e da Rede 2:
+3. No Switch da Rede 1 e da Rede 2:
     *Obs: VLAN 1 já vem configurada por default*
     - Cria VLAN 2
     - Configura portas 1 e 2 para vlan1
@@ -158,7 +158,7 @@
     Swtich>  
      ```
 
-5. No Switch intermediário:
+4. No Switch intermediário:
     *Obs: VLAN 1 já vem configurada por default*
     - Cria VLAN 2
     - Configura porta 1 para vlan1 e vlan2 (modo trunk)
@@ -184,7 +184,7 @@
     Swtich>  
      ```
 
-6. Pings
+5. Pings
     1. VLAN1 com VLAN1 (No mesmo switch)
         - PC10 -> PC20
        
@@ -198,14 +198,14 @@
     3. VLAN1 com VLAN1 (Em switchs diferentes)
         - PC10 -> PC50
        
-          ![image](https://github.com/user-attachments/assets/7596127f-9bf7-40a3-841c-7a7fe26b4e3c)
+          ![image](https://github.com/user-attachments/assets/4a2e114c-092d-488d-bc29-ab4190a0855d)
 
     4. VLAN1 com VLAN2 (Em switchs diferentes)
         - PC10 -> PC70
        
-          ![image](https://github.com/user-attachments/assets/0c3bfdfb-9fdb-488b-b36f-14dd2ca39cfe)
+          ![image](https://github.com/user-attachments/assets/75b1b79d-cd13-4e12-8c70-b32dd524919f)
 
-7. Alterando tudo para VLAN 1:
+6. Alterando tudo para VLAN 1:
     *Obs: VLAN 1 já vem configurada por default*
     - Configura portas 3 e 4 para vlan1
     - As portas 1 e 2 já estão na vlan1
@@ -221,23 +221,23 @@
     Swtich>  
      ```
 
-8. Pings
+7. Pings
     1. VLAN1 com VLAN1 (No mesmo switch)
         - PC10 -> PC20
        
-           !
+           ![image](https://github.com/user-attachments/assets/17e19a9f-342b-41cc-bcdf-7d886c911da7)
         
     2. VLAN1 com VLAN1 (No mesmo switch)
         - PC10 -> PC30
        
-           ![image](https://github.com/user-attachments/assets/e8809223-09eb-4a88-bd0a-a672722d390e)
+           ![image](https://github.com/user-attachments/assets/c1a8e5ee-21be-4b51-aa04-41f8fc961e77)
           
     3. VLAN1 com VLAN1 (Em switchs diferentes)
         - PC10 -> PC50
        
-          ![image](https://github.com/user-attachments/assets/7596127f-9bf7-40a3-841c-7a7fe26b4e3c)
+          ![image](https://github.com/user-attachments/assets/4a2e114c-092d-488d-bc29-ab4190a0855d)
 
     4. VLAN1 com VLAN1 (Em switchs diferentes)
         - PC10 -> PC70
        
-          ![image](https://github.com/user-attachments/assets/0c3bfdfb-9fdb-488b-b36f-14dd2ca39cfe)
+          ![image](https://github.com/user-attachments/assets/d76f31d8-52c2-48f4-a037-eae68e929e85)
